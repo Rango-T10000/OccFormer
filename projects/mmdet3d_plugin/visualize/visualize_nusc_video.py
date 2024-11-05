@@ -5,7 +5,7 @@ import cv2
 from PIL import Image
 from tqdm import tqdm
 from mayavi import mlab
-from visualize_nusc_release import draw_nusc_occupancy
+from visualize_nusc import draw_nusc_occupancy
 
 import mayavi
 mlab.options.offscreen = True
