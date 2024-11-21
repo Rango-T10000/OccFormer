@@ -1,5 +1,4 @@
-#这个代码有问题，这样生成的verts和faces都少很多
-
+#这套是最终代码，材质的ID肯定会有重复，最终解决方式就是在sionna上再自定义就行了，没关系
 import bpy
 import pickle
 from mathutils import Vector
@@ -35,42 +34,75 @@ class_colors = [
 ]
 
 ITU_materia_name = [
-    "itu_concrete",             # barrier              orange
-    "itu_metal",                # bicycle              pink
-    "itu_metal",                # bus                  yellow
-    "itu_metal",                # car                  blue
-    "itu_metal",                # construction_vehicle cyan
-    "itu_metal",                # motorcycle           dark orange
-    "vacuum",                   # pedestrian           red
-    "itu_plasterboard",         # traffic_cone         light yellow
-    "itu_metal",                # trailer              brown
-    "itu_metal",                # truck                purple                
-    "itu_medium_dry_ground",    # driveable_surface    dark pink
-    "itu_floorboard",           # other_flat           dark red
-    "itu_floorboard",           # sidewalk             dark purple
-    "itu_medium_dry_ground",    # terrain              light green          
-    "itu_marble",               # manmade              white
-    "itu_wood",                 # vegetation           green
+    "itu_concrete",             # barrier               0            orange       
+    "itu_brick",                # bicycle               1            pink
+    "itu_metal",                # bus                   2            yellow
+    "itu_glass",                # car                   3            blue
+    "itu_chipboard",            # construction_vehicle  4            cyan
+    "itu_plywood",              # motorcycle            5            dark orange
+    "vacuum",                   # pedestrian            6            red
+    "itu_plasterboard",         # traffic_cone          7            light yellow
+    "itu_very_dry_ground",      # trailer               8            brown
+    "itu_wet_ground",           # truck                 9           purple                
+    "itu_medium_dry_ground",    # driveable_surface     10           dark pink
+    "itu_ceiling_board",        # other_flat            11           dark red
+    "itu_concrete",             # sidewalk              12           dark purple
+    "itu_marble",               # terrain               13           light green          
+    "itu_chipboard",            # manmade               14           white
+    "itu_wood",                 # vegetation            15           green
 ]
 
-# 创建材质并设置颜色，每种材质都是一个bpy.data.materials对象，可以有很多属性，比方：name,nodes,color
-materials = {}
-for i, (name, color) in enumerate(zip(ITU_materia_name, class_colors)):
-    if name not in materials:  # 如果材质尚未创建
-        mat = bpy.data.materials.new(name=name)
-        mat.use_nodes = True  # 启用节点
-        materials[name] = mat  # 保存材质对象
-        # 设置材质颜色
-        nodes = mat.node_tree.nodes
-        bsdf_node = nodes.get("Principled BSDF")
-        if bsdf_node:  # 确保 Principled BSDF 节点存在
-            bsdf_node.inputs["Base Color"].default_value = (
-                color[0] / 255,
-                color[1] / 255,
-                color[2] / 255,
-                color[3] / 255,
-            )
+# 创建材质并设置颜色
+materials = []
+for i, color in enumerate(class_colors):
+    # 根据 i 的值设置材质名称
+    if i == 0:
+        mat_name = "itu_concrete"
+    elif i ==1:
+        mat_name = "itu_brick"
+    elif i ==2:
+        mat_name = "itu_metal"
+    elif i ==3:
+        mat_name = "itu_glass"
+    elif i ==4:
+        mat_name = "itu_chipboard"
+    elif i ==5:
+        mat_name = "itu_plywood"
+    elif i ==6:
+        mat_name = "vacuum"
+    elif i ==7:
+        mat_name = "itu_plasterboard"
+    elif i ==8:
+        mat_name = "itu_very_dry_ground"
+    elif i ==9:
+        mat_name = "itu_wet_ground"
+    elif i ==10:
+        mat_name = "itu_medium_dry_ground"
+    elif i ==11:
+        mat_name = "itu_ceiling_board"
+    elif i ==12:
+        mat_name = "itu_concrete"
+    elif i ==13:
+        mat_name = "itu_marble"
+    elif i ==14:
+        mat_name = "itu_chipboard"
+    elif i ==15:
+        mat_name = "itu_wood"   
+    else:
+        mat_name = f"Material_{i}"  # 默认情况
 
+    # 创建材质
+    mat = bpy.data.materials.new(name=mat_name)
+
+    # 设置材质颜色
+    mat.use_nodes = False  # 禁用节点，直接使用 diffuse_color
+    mat.diffuse_color = (
+        color[0] / 255,
+        color[1] / 255,
+        color[2] / 255,
+        color[3] / 255
+    )
+    materials.append(mat)
 
 #-----------------------------------方法1:直接生成一个网格对象，而不是单独添加立方体-------------------------
 # 优化：批量创建体素网格
@@ -116,6 +148,8 @@ for x in range(len(voxel_data)):
                 face_materials.extend([value-1] * 6)  # 每个面使用同样的材质
 
                 cube_count += 1
+
+print('\n')
 print(len(verts))
 print(len(faces))
 
@@ -125,8 +159,8 @@ mesh.from_pydata(verts, [], faces)               #使用先前生成的顶点和
 obj = bpy.data.objects.new("VoxelObject", mesh)  #创建一个新的obj对象，将网格对象与新对象关联
 bpy.context.collection.objects.link(obj)         #将新对象链接到当前场景的集合中
 
-# 将所有的材质添加到对象的材质槽中。这里你逐个将materials字典中的材质(bpy.data.materials对象)添加到网格对象obj的data.materials属性中
-for mat_name, mat in materials.items():
+# 将所有的材质添加到对象的材质槽中。这里你逐个将materials列表中的材质(bpy.data.materials对象)添加到网格对象obj的data.materials属性中
+for i, mat in enumerate(materials):
     obj.data.materials.append(mat)
 
 # 为每个面分配对应的材质
