@@ -4,9 +4,9 @@ import numpy as np
 
 #------------------------读取查看.pkl文件----------------------
 # 定义文件路径
-# file_path = '/home2/wzc/UniAD/data/occformer_infos/nuscenes_infos_temporal_val_visualize.pkl'
+file_path = '/home2/wzc/UniAD/data/occformer_infos/nuscenes_infos_temporal_val_visualize.pkl'
 # file_path = '/home2/wzc/OccFormer/fsc_data/data/infos/data_info_0_108.pkl'
-file_path = '/home2/wzc/OccFormer/fsc_data/inf_result/prediction/scene-0001/1730853549000000.pkl'
+# file_path = '/home2/wzc/OccFormer/fsc_data/inf_result/prediction/scene-0001/1730853549000000.pkl'
 # 读取 .pkl 文件
 with open(file_path, 'rb') as file:
     data = pickle.load(file)

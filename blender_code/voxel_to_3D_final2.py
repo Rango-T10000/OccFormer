@@ -4,7 +4,7 @@ import pickle
 from mathutils import Vector
 
 # 读取 .pkl 文件
-file_path = '/Users/wangzhicheng/Desktop/FSD/Blender_3D/prediction/scene-0003/1533201470448696.pkl'
+file_path = '/Users/wangzhicheng/Desktop/FSD/Blender_3D/prediction/scene-0039/1532400532862460.pkl'
 with open(file_path, 'rb') as file:
     data = pickle.load(file)
 
